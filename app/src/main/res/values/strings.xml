@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Location Stream Example</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="launch_activity">Launch Location Stream example</string>
+    <string name="remove_location_updates">Remove Location Stream example</string>
+    <string name="notification_content_text">Updating location</string>
+    <string name="permission_rationale">Location permission is needed for core functionality.</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core functionality.</string>
+    <string name="location_updated">Location Updated: %1$s</string>
+    <string name="ok">Ok</string>
+    <string name="reading_location_text">Getting location every 100mts</string>
+</resources>
