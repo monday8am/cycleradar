@@ -9,13 +9,12 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
-import com.monday8am.locationstream.Injection
 import com.monday8am.locationstream.MainActivity
 import com.monday8am.locationstream.R
-import com.monday8am.locationstream.data.PhotoDataRepository
 import com.monday8am.locationstream.data.UserLocation
-import java.text.DateFormat
-import java.util.*
+import com.monday8am.locationstream.redux.NewLocationDetected
+import com.monday8am.locationstream.redux.StartStopUpdating
+import com.monday8am.locationstream.store
 
 
 const val packageNameString = "com.monday8am.locationupdatesforegroundservice"
@@ -35,8 +34,6 @@ class LocationUpdatesService : Service() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLocationCallback: LocationCallback
     private lateinit var mServiceHandler: Handler
-
-    private lateinit var repo: PhotoDataRepository
 
     override fun onCreate() {
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -59,8 +56,6 @@ class LocationUpdatesService : Service() {
             val mChannel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_DEFAULT)
             mNotificationManager.createNotificationChannel(mChannel)
         }
-
-        repo = Injection.providePhotoDataRepository(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -70,7 +65,7 @@ class LocationUpdatesService : Service() {
             removeLocationUpdates()
             stopSelf()
         }
-        return Service.START_NOT_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -98,7 +93,7 @@ class LocationUpdatesService : Service() {
         // Called when the last client (MainActivity in case of this sample) unbinds from this
         // service. If this method is called due to a configuration change in MainActivity, we
         // do nothing. Otherwise, we make this service a foreground service.
-        if (!mChangingConfiguration && repo.isRequestingLocation()) {
+        if (!mChangingConfiguration && store.state.isGettingLocation) {
             Log.i(tag, "Starting foreground service")
             startForeground(notificationId, getNotification())
         }
@@ -109,31 +104,29 @@ class LocationUpdatesService : Service() {
         mServiceHandler.removeCallbacksAndMessages(null)
     }
 
-    //  Removes location updates
+    //  Request location updates
 
-    fun requestLocationUpdates(): Boolean {
+    fun requestLocationUpdates() {
         Log.i(tag, "Requesting location updates")
         startService(Intent(applicationContext, LocationUpdatesService::class.java))
-        return try {
+        try {
             mFusedLocationClient.requestLocationUpdates(createLocationRequest(), mLocationCallback, Looper.myLooper())
-            true
+            store.dispatch(StartStopUpdating(isUpdating = true))
         } catch (unlikely: SecurityException) {
             Log.e(tag, "Lost location permission. Could not request updates. $unlikely")
-            false
         }
     }
 
     //  Removes location updates
 
-    fun removeLocationUpdates(): Boolean {
+    fun removeLocationUpdates() {
         Log.i(tag, "Removing location updates")
-        return try {
+        try {
             mFusedLocationClient.removeLocationUpdates(mLocationCallback)
             stopSelf()
-            true
+            store.dispatch(StartStopUpdating(isUpdating = false))
         } catch (unlikely: SecurityException) {
             Log.e(tag, "Lost location permission. Could not remove updates. $unlikely")
-            false
         }
     }
 
@@ -165,8 +158,8 @@ class LocationUpdatesService : Service() {
     }
 
     private fun onNewLocation(location: Location) {
-        repo.addPhotoFromLocation(UserLocation(longitude = location.longitude, latitude = location.latitude))
-            .subscribe()
+        val userLocation = UserLocation(longitude = location.longitude, latitude = location.latitude)
+        store.dispatch(NewLocationDetected(location = userLocation))
     }
 
     private fun createLocationRequest(): LocationRequest {
@@ -176,20 +169,6 @@ class LocationUpdatesService : Service() {
         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         return mLocationRequest
-    }
-
-    private fun getLocationText(location: UserLocation?): String {
-        return if (location == null)
-            "Unknown location"
-        else
-            "(" + location.latitude + ", " + location.longitude + ")"
-    }
-
-    private fun getLocationTitle(context: Context): String {
-        return context.getString(
-            R.string.location_updated,
-            DateFormat.getDateTimeInstance().format(Date())
-        )
     }
 
     inner class LocalBinder : Binder() {

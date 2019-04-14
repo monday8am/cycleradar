@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 
 class PhotoListTestingAdapter(private val models: List<Photo>): RecyclerView.Adapter<PhotoListTestingAdapter.ViewHolder>(){
 
-    override fun onBindViewHolder(holder: PhotoListTestingAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = models[position]
 
         holder.titleTextView.text = "id:${model.photoId} Loc:${model.latitude}/${model.longitude}"
@@ -36,7 +36,7 @@ class PhotoListTestingAdapter(private val models: List<Photo>): RecyclerView.Ada
         return models.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoListTestingAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.test_item_layout, parent, false)
         return ViewHolder(v)
     }

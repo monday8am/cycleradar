@@ -11,25 +11,22 @@ import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.monday8am.locationstream.location.LocationUpdatesService
+import com.monday8am.locationstream.redux.AppState
+import com.monday8am.locationstream.redux.SetInitialContent
 import com.monday8am.locationstream.ui.PhotoListAdapter
-import com.monday8am.locationstream.ui.PhotoListViewModel
-import com.monday8am.locationstream.ui.ViewModelFactory
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import android.widget.Toast
+import org.rekotlin.StoreSubscriber
 
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
 
     private val tag = "MainActivity"
 
@@ -40,14 +37,9 @@ class MainActivity : AppCompatActivity() {
     private var startMenuItem: MenuItem? = null
     private var stopMenuItem: MenuItem? = null
 
-    private lateinit var viewModelFactory: ViewModelFactory
-    private lateinit var viewModel: PhotoListViewModel
     // Use it for testing!
     //private lateinit var listAdapter: PhotoListTestingAdapter
 
-    private lateinit var listAdapter: PhotoListAdapter
-
-    private val disposables: CompositeDisposable = CompositeDisposable()
 
     private val mServiceConnection = object : ServiceConnection {
 
@@ -69,8 +61,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         photoRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        viewModelFactory = Injection.provideViewModelFactory(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(PhotoListViewModel::class.java)
+        // Set saved content!
+        val isUpdatingLocation = LocationApp.repository?.isRequestingLocation() ?: false
+        LocationApp.repository?.getPhotos()
+                              ?.subscribe { cachedPhotos ->
+                                  store.dispatch(SetInitialContent(photos = cachedPhotos,
+                                                                   isUpdating = isUpdatingLocation))
+                              }
     }
 
     override fun onStart() {
@@ -84,27 +81,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        disposables.add(viewModel.isRequestingLocation()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { value ->
-                startMenuItem?.isVisible = !value
-                stopMenuItem?.isVisible = value
-            })
-
-        disposables.add(viewModel.getPhotos()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { value ->
-                listAdapter = PhotoListAdapter(value)
-                // Use it for testing!
-                // listAdapter = PhotoListTestingAdapter(value)
-                photoRecyclerView.adapter = listAdapter
-            })
+        store.subscribe(this)
     }
 
     override fun onPause() {
-        disposables.clear()
+        store.unsubscribe(this)
         super.onPause()
+    }
+
+    override fun newState(state: AppState) {
+        runOnUiThread {
+            startMenuItem?.isVisible = state.isGettingLocation
+            stopMenuItem?.isVisible = state.isGettingLocation
+            photoRecyclerView.adapter = PhotoListAdapter(state.photos)
+        }
     }
 
     override fun onStop() {
@@ -123,9 +113,8 @@ class MainActivity : AppCompatActivity() {
         startMenuItem = menu.findItem(R.id.action_start)
         stopMenuItem = menu.findItem(R.id.action_stop)
 
-        val isActivated = viewModel.isRequestingLocation().value ?: false
-        startMenuItem?.isVisible = !isActivated
-        stopMenuItem?.isVisible = isActivated
+        startMenuItem?.isVisible = store.state.isGettingLocation
+        stopMenuItem?.isVisible = !store.state.isGettingLocation
 
         return true
     }
@@ -149,13 +138,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startRequestingLocation() {
-        val success = mService?.requestLocationUpdates() ?: false
-        viewModel.startStopRequestingLocation(success)
+         mService?.requestLocationUpdates()
     }
 
     private fun stopRequestingLocation() {
-        val success = mService?.removeLocationUpdates() ?: false
-        viewModel.startStopRequestingLocation(!success)
+        mService?.removeLocationUpdates()
     }
 
     private fun checkPermissions(): Boolean {

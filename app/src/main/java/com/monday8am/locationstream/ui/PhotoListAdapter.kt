@@ -14,7 +14,7 @@ import com.monday8am.locationstream.data.Photo
 
 class PhotoListAdapter(private val models: List<Photo>): RecyclerView.Adapter<PhotoListAdapter.ViewHolder>(){
 
-    override fun onBindViewHolder(holder: PhotoListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = models[position]
         when (model.imageUrl) {
             null ->  holder.spinner.visibility = if (model.completed) View.GONE else View.VISIBLE
@@ -34,7 +34,7 @@ class PhotoListAdapter(private val models: List<Photo>): RecyclerView.Adapter<Ph
         return models.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoListAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false)
         return ViewHolder(v)
     }
