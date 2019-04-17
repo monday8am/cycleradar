@@ -21,6 +21,7 @@ import com.monday8am.locationstream.location.LocationUpdatesService
 import com.monday8am.locationstream.redux.AppState
 import com.monday8am.locationstream.redux.SetInitialContent
 import com.monday8am.locationstream.ui.PhotoListAdapter
+import com.monday8am.locationstream.ui.PhotoListTestingAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.rekotlin.StoreSubscriber
@@ -39,7 +40,6 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
 
     // Use it for testing!
     //private lateinit var listAdapter: PhotoListTestingAdapter
-
 
     private val mServiceConnection = object : ServiceConnection {
 
@@ -63,10 +63,13 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
 
         // Set saved content!
         val isUpdatingLocation = LocationApp.repository?.isRequestingLocation() ?: false
+        val lastLocation = LocationApp.repository?.getLastLocationSaved()
         LocationApp.repository?.getPhotos()
+                              ?.take(1)
                               ?.subscribe { cachedPhotos ->
                                   store.dispatch(SetInitialContent(photos = cachedPhotos,
-                                                                   isUpdating = isUpdatingLocation))
+                                                                   isUpdating = isUpdatingLocation,
+                                                                   lastLocation = lastLocation))
                               }
     }
 
@@ -91,9 +94,10 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
 
     override fun newState(state: AppState) {
         runOnUiThread {
-            startMenuItem?.isVisible = state.isGettingLocation
+            startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
-            photoRecyclerView.adapter = PhotoListAdapter(state.photos)
+            //photoRecyclerView.adapter = PhotoListAdapter(state.photos.asReversed())
+            photoRecyclerView.adapter = PhotoListTestingAdapter(state.photos.asReversed())
         }
     }
 
@@ -113,8 +117,8 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
         startMenuItem = menu.findItem(R.id.action_start)
         stopMenuItem = menu.findItem(R.id.action_stop)
 
-        startMenuItem?.isVisible = store.state.isGettingLocation
-        stopMenuItem?.isVisible = !store.state.isGettingLocation
+        startMenuItem?.isVisible = !store.state.isGettingLocation
+        stopMenuItem?.isVisible = store.state.isGettingLocation
 
         return true
     }
