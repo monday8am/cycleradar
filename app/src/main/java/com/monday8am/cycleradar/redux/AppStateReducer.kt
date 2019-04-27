@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.redux
+package com.monday8am.cycleradar.redux
 
 import org.rekotlin.Action
 

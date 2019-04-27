@@ -1,9 +1,9 @@
-package com.monday8am.locationstream.redux
+package com.monday8am.cycleradar.redux
 
 import android.util.Log
-import com.monday8am.locationstream.LocationApp
-import com.monday8am.locationstream.data.Photo
-import com.monday8am.locationstream.data.UserLocation
+import com.monday8am.cycleradar.LocationApp
+import com.monday8am.cycleradar.data.Photo
+import com.monday8am.cycleradar.data.UserLocation
 import io.reactivex.disposables.Disposable
 import org.rekotlin.DispatchFunction
 import org.rekotlin.Middleware

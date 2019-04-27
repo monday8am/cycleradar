@@ -1,10 +1,10 @@
-package com.monday8am.locationstream.data.local
+package com.monday8am.cycleradar.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.monday8am.locationstream.data.Photo
+import com.monday8am.cycleradar.data.Photo
 
 
 @Database(entities = [Photo::class], version = 1)

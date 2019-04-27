@@ -1,4 +1,4 @@
-package com.monday8am.locationstream
+package com.monday8am.cycleradar
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

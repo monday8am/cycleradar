@@ -1,4 +1,4 @@
-package com.monday8am.locationstream
+package com.monday8am.cycleradar
 
 import android.Manifest
 import android.content.ComponentName
@@ -17,11 +17,10 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.monday8am.locationstream.location.LocationUpdatesService
-import com.monday8am.locationstream.redux.AppState
-import com.monday8am.locationstream.redux.SetInitialContent
-import com.monday8am.locationstream.ui.PhotoListAdapter
-import com.monday8am.locationstream.ui.PhotoListTestingAdapter
+import com.monday8am.cycleradar.location.LocationUpdatesService
+import com.monday8am.cycleradar.redux.AppState
+import com.monday8am.cycleradar.redux.SetInitialContent
+import com.monday8am.cycleradar.ui.PhotoListTestingAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.rekotlin.StoreSubscriber

@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.data.remote
+package com.monday8am.cycleradar.data.remote
 
 import io.reactivex.Observable
 import retrofit2.http.GET

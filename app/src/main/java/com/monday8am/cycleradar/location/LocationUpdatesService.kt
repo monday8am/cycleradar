@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.location
+package com.monday8am.cycleradar.location
 
 import android.app.*
 import android.content.Context
@@ -9,12 +9,12 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
-import com.monday8am.locationstream.MainActivity
-import com.monday8am.locationstream.R
-import com.monday8am.locationstream.data.UserLocation
-import com.monday8am.locationstream.redux.NewLocationDetected
-import com.monday8am.locationstream.redux.StartStopUpdating
-import com.monday8am.locationstream.store
+import com.monday8am.cycleradar.MainActivity
+import com.monday8am.cycleradar.R
+import com.monday8am.cycleradar.data.UserLocation
+import com.monday8am.cycleradar.redux.NewLocationDetected
+import com.monday8am.cycleradar.redux.StartStopUpdating
+import com.monday8am.cycleradar.store
 
 
 const val packageNameString = "com.monday8am.locationupdatesforegroundservice"

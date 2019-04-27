@@ -1,11 +1,11 @@
-package com.monday8am.locationstream.data
+package com.monday8am.cycleradar.data
 
 
-import com.monday8am.locationstream.SchedulerProvider
-import com.monday8am.locationstream.data.local.PhotoDao
-import com.monday8am.locationstream.data.local.PreferencesHelper
-import com.monday8am.locationstream.data.remote.PhotosSearchResponse
-import com.monday8am.locationstream.data.remote.RemoteWebService
+import com.monday8am.cycleradar.SchedulerProvider
+import com.monday8am.cycleradar.data.local.PhotoDao
+import com.monday8am.cycleradar.data.local.PreferencesHelper
+import com.monday8am.cycleradar.data.remote.PhotosSearchResponse
+import com.monday8am.cycleradar.data.remote.RemoteWebService
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable

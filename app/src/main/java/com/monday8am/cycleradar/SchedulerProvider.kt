@@ -1,4 +1,4 @@
-package com.monday8am.locationstream
+package com.monday8am.cycleradar
 
 
 import io.reactivex.Scheduler

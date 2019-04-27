@@ -1,8 +1,8 @@
-package com.monday8am.locationstream.data.local
+package com.monday8am.cycleradar.data.local
 
 
 import androidx.room.*
-import com.monday8am.locationstream.data.Photo
+import com.monday8am.cycleradar.data.Photo
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

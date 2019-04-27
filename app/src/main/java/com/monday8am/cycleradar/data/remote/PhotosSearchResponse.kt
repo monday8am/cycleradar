@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.data.remote
+package com.monday8am.cycleradar.data.remote
 
 
 data class PhotosSearchResponse(val photos: PhotoContainer?, val stat: String?)

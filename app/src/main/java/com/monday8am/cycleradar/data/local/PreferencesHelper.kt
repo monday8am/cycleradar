@@ -1,9 +1,9 @@
-package com.monday8am.locationstream.data.local
+package com.monday8am.cycleradar.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.monday8am.locationstream.data.UserLocation
+import com.monday8am.cycleradar.data.UserLocation
 
 class PreferencesHelper constructor(context: Context) {
 

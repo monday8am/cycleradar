@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="com.monday8am.locationstream">
+          xmlns:tools="http://schemas.android.com/tools" package="com.monday8am.cycleradar">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-            android:name=".LocationApp"
+            android:name="com.monday8am.cycleradar.LocationApp"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
@@ -15,13 +15,13 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
         <service
-                android:name="com.monday8am.locationstream.location.LocationUpdatesService"
+                android:name="com.monday8am.cycleradar.location.LocationUpdatesService"
                 android:enabled="true"
                 android:exported="false">
         </service>
 
         <activity
-                android:name="com.monday8am.locationstream.MainActivity"
+                android:name="com.monday8am.cycleradar.MainActivity"
                 android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

@@ -1,7 +1,7 @@
-package com.monday8am.locationstream.redux
+package com.monday8am.cycleradar.redux
 
-import com.monday8am.locationstream.data.Photo
-import com.monday8am.locationstream.data.UserLocation
+import com.monday8am.cycleradar.data.Photo
+import com.monday8am.cycleradar.data.UserLocation
 import org.rekotlin.Action
 
 data class SetInitialContent(val photos: List<Photo>,

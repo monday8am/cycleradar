@@ -1,15 +1,15 @@
-package com.monday8am.locationstream
+package com.monday8am.cycleradar
 
 import android.app.Application
 import android.content.Context
-import com.monday8am.locationstream.data.PhotoDataRepository
-import com.monday8am.locationstream.data.local.PhotoDao
-import com.monday8am.locationstream.data.local.PhotosDatabase
-import com.monday8am.locationstream.data.local.PreferencesHelper
-import com.monday8am.locationstream.data.remote.RemoteWebService
-import com.monday8am.locationstream.redux.appStateReducer
-import com.monday8am.locationstream.redux.loggingMiddleware
-import com.monday8am.locationstream.redux.networkMiddleware
+import com.monday8am.cycleradar.data.PhotoDataRepository
+import com.monday8am.cycleradar.data.local.PhotoDao
+import com.monday8am.cycleradar.data.local.PhotosDatabase
+import com.monday8am.cycleradar.data.local.PreferencesHelper
+import com.monday8am.cycleradar.data.remote.RemoteWebService
+import com.monday8am.cycleradar.redux.appStateReducer
+import com.monday8am.cycleradar.redux.loggingMiddleware
+import com.monday8am.cycleradar.redux.networkMiddleware
 import org.rekotlin.Store
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

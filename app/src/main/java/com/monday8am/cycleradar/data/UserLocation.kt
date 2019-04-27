@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.data
+package com.monday8am.cycleradar.data
 
 data class UserLocation(val longitude: Double, val latitude: Double) {
 

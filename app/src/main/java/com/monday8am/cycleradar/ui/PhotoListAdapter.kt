@@ -1,4 +1,4 @@
-package com.monday8am.locationstream.ui
+package com.monday8am.cycleradar.ui
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.monday8am.locationstream.R
-import com.monday8am.locationstream.data.Photo
+import com.monday8am.cycleradar.R
+import com.monday8am.cycleradar.data.Photo
 
 class PhotoListAdapter(private val models: List<Photo>): RecyclerView.Adapter<PhotoListAdapter.ViewHolder>(){
 
