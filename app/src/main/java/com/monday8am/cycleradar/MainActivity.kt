@@ -14,25 +14,27 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.monday8am.cycleradar.location.LocationUpdatesService
 import com.monday8am.cycleradar.redux.AppState
-import com.monday8am.cycleradar.redux.SetInitialContent
-import com.monday8am.cycleradar.ui.PhotoListTestingAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
 import org.rekotlin.StoreSubscriber
 
 
-class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
+class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyCallback {
 
     private val tag = "MainActivity"
 
     private val requestPermissionsRequestCode = 34
     private var mService: LocationUpdatesService? = null
     private var mBound = false
+    private lateinit var mMap: GoogleMap
 
     private var startMenuItem: MenuItem? = null
     private var stopMenuItem: MenuItem? = null
@@ -58,18 +60,10 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        photoRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        // Set saved content!
-        val isUpdatingLocation = LocationApp.repository?.isRequestingLocation() ?: false
-        val lastLocation = LocationApp.repository?.getLastLocationSaved()
-        LocationApp.repository?.getPhotos()
-                              ?.take(1)
-                              ?.subscribe { cachedPhotos ->
-                                  store.dispatch(SetInitialContent(photos = cachedPhotos,
-                                                                   isUpdating = isUpdatingLocation,
-                                                                   lastLocation = lastLocation))
-                              }
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onStart() {
@@ -95,8 +89,6 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
         runOnUiThread {
             startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
-            //photoRecyclerView.adapter = PhotoListAdapter(state.photos.asReversed())
-            photoRecyclerView.adapter = PhotoListTestingAdapter(state.photos.asReversed())
         }
     }
 
@@ -138,6 +130,24 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState> {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Add a marker in Sydney and move the camera
+        val sydney = LatLng(-34.0, 151.0)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
     private fun startRequestingLocation() {
