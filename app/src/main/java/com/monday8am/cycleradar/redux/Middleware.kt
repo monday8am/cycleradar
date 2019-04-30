@@ -1,7 +1,7 @@
 package com.monday8am.cycleradar.redux
 
 import android.util.Log
-import com.monday8am.cycleradar.LocationApp
+import com.monday8am.cycleradar.CycleRadarApp
 import com.monday8am.cycleradar.data.Photo
 import com.monday8am.cycleradar.data.UserLocation
 import io.reactivex.disposables.Disposable
@@ -34,7 +34,7 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, state ->
                 is AddNewPhoto -> {
                     getImageForLocation(action.photo, dispatch)
                 }
-                is StartStopUpdating -> LocationApp.repository?.setRequestingLocation(action.isUpdating)
+                is StartStopUpdating -> CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
             }
             next(action)
         }
@@ -42,7 +42,7 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, state ->
 }
 
 fun savePhotoForLocation(location: UserLocation, dispatch: DispatchFunction) {
-    savePhotoDisposable = LocationApp.repository?.addPhotoFromLocation(location = location)
+    savePhotoDisposable = CycleRadarApp.repository?.addPhotoFromLocation(location = location)
                                                 ?.subscribe { photo ->
                                                     if (photo != null) {
                                                         dispatch(AddNewPhoto(photo, location))
@@ -51,7 +51,7 @@ fun savePhotoForLocation(location: UserLocation, dispatch: DispatchFunction) {
 }
 
 fun getImageForLocation(photo: Photo, dispatch: DispatchFunction) {
-    val repo = LocationApp.repository
+    val repo = CycleRadarApp.repository
     if (repo != null) {
         getImageDisposable = repo
             .getRemoteImageFor(longitude = photo.longitude, latitude = photo.latitude)

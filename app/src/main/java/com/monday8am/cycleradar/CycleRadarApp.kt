@@ -21,7 +21,7 @@ val store = Store(
     middleware = listOf(networkMiddleware, loggingMiddleware)
 )
 
-class LocationApp: Application() {
+class CycleRadarApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -33,7 +33,7 @@ class LocationApp: Application() {
     }
 
     companion object {
-        @get:Synchronized lateinit var instance: LocationApp
+        @get:Synchronized lateinit var instance: CycleRadarApp
             private set
 
         var repository: PhotoDataRepository? = null
