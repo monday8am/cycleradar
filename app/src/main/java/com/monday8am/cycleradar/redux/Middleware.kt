@@ -2,7 +2,7 @@ package com.monday8am.cycleradar.redux
 
 import android.util.Log
 import com.monday8am.cycleradar.CycleRadarApp
-import com.monday8am.cycleradar.data.Photo
+import com.monday8am.cycleradar.data.Cyclist
 import com.monday8am.cycleradar.data.UserLocation
 import io.reactivex.disposables.Disposable
 import org.rekotlin.DispatchFunction
@@ -28,11 +28,11 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, state ->
                 is NewLocationDetected -> {
                     val lastLocation = state()?.lastLocationSaved
                     if (action.location.isUseful(lastLocation = lastLocation)) {
-                        savePhotoForLocation(action.location, dispatch)
+                        saveUserLocation(action.location, dispatch)
                     }
                 }
-                is AddNewPhoto -> {
-                    getImageForLocation(action.photo, dispatch)
+                is AddNewCyclist -> {
+                    getImageForLocation(action.cyclist, dispatch)
                 }
                 is StartStopUpdating -> CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
             }
@@ -41,26 +41,11 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, state ->
     }
 }
 
-fun savePhotoForLocation(location: UserLocation, dispatch: DispatchFunction) {
-    savePhotoDisposable = CycleRadarApp.repository?.addPhotoFromLocation(location = location)
-                                                ?.subscribe { photo ->
-                                                    if (photo != null) {
-                                                        dispatch(AddNewPhoto(photo, location))
-                                                    }
-                                                }
+fun saveUserLocation(location: UserLocation, dispatch: DispatchFunction) {
+
 }
 
-fun getImageForLocation(photo: Photo, dispatch: DispatchFunction) {
-    val repo = CycleRadarApp.repository
-    if (repo != null) {
-        getImageDisposable = repo
-            .getRemoteImageFor(longitude = photo.longitude, latitude = photo.latitude)
-            .subscribe { imageUrl ->
-                repo.updatePhotoWithImage(photo, imageUrl)
-                    .subscribe {
-                        val updated = photo.copy(imageUrl = imageUrl)
-                        dispatch(UpdatePhotoWithImage(updated))
-                    }
-            }
-    }
+fun getImageForLocation(cyclist: Cyclist, dispatch: DispatchFunction) {
+
 }
+

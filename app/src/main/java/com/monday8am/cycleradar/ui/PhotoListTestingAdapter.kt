@@ -11,15 +11,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.monday8am.cycleradar.R
-import com.monday8am.cycleradar.data.Photo
+import com.monday8am.cycleradar.data.Cyclist
 import kotlin.math.roundToInt
 
-class PhotoListTestingAdapter(private val models: List<Photo>): RecyclerView.Adapter<PhotoListTestingAdapter.ViewHolder>(){
+class PhotoListTestingAdapter(private val models: List<Cyclist>): RecyclerView.Adapter<PhotoListTestingAdapter.ViewHolder>(){
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = models[position]
 
-        holder.titleTextView.text = "id:${model.photoId} Loc:${model.latitude}/${model.longitude}"
+        holder.titleTextView.text = "id:${model.cyclistId} Loc:${model.latitude}/${model.longitude}"
         holder.subtitleTextView.text = "Distance: ${distanceWithPrevious(position)} meters"
         if (model.imageUrl != null) {
             Glide

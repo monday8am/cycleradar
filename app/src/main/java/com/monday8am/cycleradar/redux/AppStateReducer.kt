@@ -8,21 +8,23 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
 
     when (action) {
         is SetInitialContent -> {
-            newState = newState.copy(isGettingLocation = action.isUpdating, photos = action.photos)
+            newState = newState.copy(isGettingLocation = action.isUpdating, lastLocationSaved = action.lastLocation)
         }
         is StartStopUpdating -> newState = newState.copy(isGettingLocation = action.isUpdating)
-        is AddNewPhoto -> {
-            val mutablePhotos = newState.photos.toMutableList()
-            mutablePhotos.add(action.photo)
-            newState = newState.copy(photos = mutablePhotos, lastLocationSaved = action.location)
+        is AddNewCyclist -> {
+            val mutablePhotos = newState.cyclists.toMutableList()
+            mutablePhotos.add(action.cyclist)
+            newState = newState.copy(cyclists = mutablePhotos)
         }
-        is UpdatePhotoWithImage -> {
-            val index = newState.photos.indexOfFirst { it.photoId == action.photo.photoId }
+        is UpdateLocationFor -> {
+            /*
+            val index = newState.cyclists.indexOfFirst { it.cyclistId == action.cyclist.cyclistId }
             if (index != -1) {
-                val mutablePhotos = newState.photos.toMutableList()
-                mutablePhotos[index] = action.photo
-                newState = newState.copy(photos = mutablePhotos)
+                val mutablePhotos = newState.cyclists.toMutableList()
+                mutablePhotos[index] = action.cyclist
+                newState = newState.copy(cyclists = mutablePhotos)
             }
+            */
         }
     }
 
@@ -33,6 +35,6 @@ private fun getInitialState(): AppState {
     return AppState(
         isGettingLocation = false,
         lastLocationSaved = null,
-        photos = listOf()
+        cyclists = listOf()
     )
 }

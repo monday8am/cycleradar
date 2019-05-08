@@ -10,9 +10,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.monday8am.cycleradar.R
-import com.monday8am.cycleradar.data.Photo
+import com.monday8am.cycleradar.data.Cyclist
 
-class PhotoListAdapter(private val models: List<Photo>): RecyclerView.Adapter<PhotoListAdapter.ViewHolder>(){
+class PhotoListAdapter(private val models: List<Cyclist>): RecyclerView.Adapter<PhotoListAdapter.ViewHolder>(){
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model = models[position]
