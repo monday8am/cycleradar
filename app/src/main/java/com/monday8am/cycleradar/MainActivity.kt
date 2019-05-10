@@ -41,9 +41,6 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     private var startMenuItem: MenuItem? = null
     private var stopMenuItem: MenuItem? = null
 
-    // Use it for testing!
-    //private lateinit var listAdapter: PhotoListTestingAdapter
-
     private val mServiceConnection = object : ServiceConnection {
 
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -96,7 +93,7 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         runOnUiThread {
             startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
-            updateMapCenter(state.lastLocationSaved)
+            updateMapCenter(store.state.meCycling?.location)
         }
     }
 
@@ -152,7 +149,9 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         // Add a marker in Sydney and move the camera
-        updateMapCenter(store.state.lastLocationSaved)
+        updateMapCenter(store.state.meCycling?.location)
+        val madridLocation = LatLng(40.416775, -3.703790)
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(madridLocation, 10.0f))
     }
 
     private fun startRequestingLocation() {
@@ -165,9 +164,8 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
 
     private fun updateMapCenter(lastLocation: UserLocation?) {
         if (lastLocation != null) {
-            val sydney = LatLng(lastLocation.latitude, lastLocation.longitude)
-            mMap?.addMarker(MarkerOptions().position(sydney).title("Anton cycling"))
-            mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 10.0f))
+            val myLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
+            mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
         }
     }
 

@@ -1,16 +1,19 @@
 package com.monday8am.cycleradar.data
 
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.monday8am.cycleradar.SchedulerProvider
 import com.monday8am.cycleradar.data.local.PreferencesHelper
 import io.reactivex.Observable
+import java.util.*
 
 
 class LocationDataRepository(private val preferences: PreferencesHelper,
                              private val scheduleProvider: SchedulerProvider) {
 
-    private val mFirestore = FirebaseFirestore.getInstance();
+    private val mFirestore = FirebaseFirestore.getInstance()
+    private val tag = "LocationDataRepository"
 
     fun isRequestingLocation(): Boolean {
         return preferences.requestingLocationUpdates()
@@ -24,23 +27,26 @@ class LocationDataRepository(private val preferences: PreferencesHelper,
         preferences.setRequestingLocationUpdates(value)
     }
 
-    fun addNewLocation(location: UserLocation): Observable<Cyclist> {
+    fun updateCyclist(cyclistId: String?, location: UserLocation): Observable<Cyclist> {
         preferences.addLastLocation(location)
+
+        val cyclist = Cyclist(latitude = location.latitude,
+                              longitude = location.longitude,
+                              id = cyclistId ?: UUID.randomUUID().toString())
+
         return Observable.create<Cyclist> {
             mFirestore.collection("cyclists")
-                .add(cyclist)
+                .document(cyclist.id)
+                .set(cyclist.toHash())
                 .addOnSuccessListener { documentReference ->
-                    documentReference.
-                    Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                    Log.d(tag, "DocumentSnapshot added with ID: $documentReference")
+                    it.onNext(cyclist)
+                    it.onComplete()
                 }
                 .addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding document", e)
+                    Log.w(tag, "Error adding document", e)
+                    it.onError(e)
                 }
         }
-
-    }
-
-    fun updateLocationFor(cyclist: Cyclist, location: UserLocation) {
-        preferences.addLastLocation(location)
     }
 }

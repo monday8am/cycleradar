@@ -7,9 +7,7 @@ import org.rekotlin.Action
 data class SetInitialContent(val isUpdating: Boolean,
                              val lastLocation: UserLocation?) : Action
 
-data class AddNewCyclist(val cyclist: Cyclist) : Action
-
-data class UpdateLocationFor(val cyclist: Cyclist, val location: UserLocation) : Action
+data class UpdateMeAsCyclist(val cyclist: Cyclist) : Action
 
 data class StartStopUpdating(val isUpdating: Boolean): Action
 
