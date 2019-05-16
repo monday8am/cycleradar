@@ -16,15 +16,8 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
             mutablePhotos.add(action.cyclist)
             newState = newState.copy(meCycling = action.cyclist)
         }
-        is NewLocationDetected -> {
-            /*
-            val index = newState.cyclists.indexOfFirst { it.cyclistId == action.cyclist.cyclistId }
-            if (index != -1) {
-                val mutablePhotos = newState.cyclists.toMutableList()
-                mutablePhotos[index] = action.cyclist
-                newState = newState.copy(cyclists = mutablePhotos)
-            }
-            */
+        is UpdateCyclists -> {
+            newState = newState.copy(cyclists = action.allCyclists)
         }
     }
 

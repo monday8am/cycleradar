@@ -9,6 +9,8 @@ data class SetInitialContent(val isUpdating: Boolean,
 
 data class UpdateMeAsCyclist(val cyclist: Cyclist) : Action
 
+data class UpdateCyclists(val allCyclists: List<Cyclist>) : Action
+
 data class StartStopUpdating(val isUpdating: Boolean): Action
 
 data class NewLocationDetected(val location: UserLocation): Action

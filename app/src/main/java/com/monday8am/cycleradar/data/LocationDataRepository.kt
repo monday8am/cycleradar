@@ -12,6 +12,7 @@ import java.util.*
 class LocationDataRepository(private val preferences: PreferencesHelper,
                              private val scheduleProvider: SchedulerProvider) {
 
+    private val collectionPath = "cyclist"
     private val mFirestore = FirebaseFirestore.getInstance()
     private val tag = "LocationDataRepository"
 
@@ -35,12 +36,31 @@ class LocationDataRepository(private val preferences: PreferencesHelper,
                               id = cyclistId ?: UUID.randomUUID().toString())
 
         return Observable.create<Cyclist> {
-            mFirestore.collection("cyclists")
+            mFirestore.collection(collectionPath)
                 .document(cyclist.id)
                 .set(cyclist.toHash())
                 .addOnSuccessListener { documentReference ->
                     Log.d(tag, "DocumentSnapshot added with ID: $documentReference")
                     it.onNext(cyclist)
+                    it.onComplete()
+                }
+                .addOnFailureListener { e ->
+                    Log.w(tag, "Error adding document", e)
+                    it.onError(e)
+                }
+        }
+    }
+
+    fun getAllCyclists(): Observable<List<Cyclist>> {
+        return Observable.create<List<Cyclist>> {
+            mFirestore.collection(collectionPath)
+                .get()
+                .addOnSuccessListener { documents ->
+                    Log.d(tag, "DocumentSnapshot containing: ${documents.count()} elements.")
+                    val cyclists = documents.map { Cyclist(longitude = it.getDouble("longitude") ?: 0.0,
+                                                           latitude = it.getDouble("latitude") ?: 0.0,
+                                                           id = it.getString("id") ?: "") }
+                    it.onNext(cyclists)
                     it.onComplete()
                 }
                 .addOnFailureListener { e ->
