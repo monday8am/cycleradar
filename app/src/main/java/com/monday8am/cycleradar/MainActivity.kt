@@ -21,8 +21,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
+import com.monday8am.cycleradar.data.UserLocation
 import com.monday8am.cycleradar.location.LocationUpdatesService
 import com.monday8am.cycleradar.redux.AppState
+import com.monday8am.cycleradar.redux.SetInitialContent
 import kotlinx.android.synthetic.main.activity_main.*
 import org.rekotlin.StoreSubscriber
 
@@ -34,13 +36,10 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     private val requestPermissionsRequestCode = 34
     private var mService: LocationUpdatesService? = null
     private var mBound = false
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
 
     private var startMenuItem: MenuItem? = null
     private var stopMenuItem: MenuItem? = null
-
-    // Use it for testing!
-    //private lateinit var listAdapter: PhotoListTestingAdapter
 
     private val mServiceConnection = object : ServiceConnection {
 
@@ -60,6 +59,11 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        // Set saved content!
+        val isUpdatingLocation = CycleRadarApp.repository?.isRequestingLocation() ?: false
+        val lastLocation = CycleRadarApp.repository?.getLastLocationSaved()
+        store.dispatch(SetInitialContent(isUpdating = isUpdatingLocation, lastLocation = lastLocation))
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -89,6 +93,7 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         runOnUiThread {
             startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
+            updateMapCenter(store.state.meCycling?.location)
         }
     }
 
@@ -143,11 +148,10 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        updateMapCenter(store.state.meCycling?.location)
+        val madridLocation = LatLng(40.416775, -3.703790)
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(madridLocation, 10.0f))
     }
 
     private fun startRequestingLocation() {
@@ -156,6 +160,13 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
 
     private fun stopRequestingLocation() {
         mService?.removeLocationUpdates()
+    }
+
+    private fun updateMapCenter(lastLocation: UserLocation?) {
+        if (lastLocation != null) {
+            val myLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
+            mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
+        }
     }
 
     private fun checkPermissions(): Boolean {
