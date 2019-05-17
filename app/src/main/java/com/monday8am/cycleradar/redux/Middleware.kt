@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 
 private var saveLocationDisposable: Disposable? = null
 private var getCyclistListDisposable: Disposable? = null
+private var deleteDispoable: Disposable? = null
 private var updatePeriod: Long = 10
 
 internal val loggingMiddleware: Middleware<AppState> = { _, _ ->
@@ -29,22 +30,24 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, getState ->
         { action ->
             when (action) {
                 is ReKotlinInit -> {
-                    updateCyclists(dispatch)
+                    getAllCyclists(dispatch)
                 }
                 is NewLocationDetected -> {
                     val meAsCyclist = getState()?.meCycling
                     if (action.location.isUseful(lastLocation = meAsCyclist?.location)) {
-                        saveUserLocation(meAsCyclist?.id, action.location, dispatch)
+                        updateCyclistLocation(meAsCyclist?.id, action.location, dispatch)
                     }
                 }
-                is StartStopUpdating -> CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
+                is StartStopUpdating -> {
+                    CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
+                }
             }
             next(action)
         }
     }
 }
 
-fun saveUserLocation(cyclistId: String?, newLocation: UserLocation, dispatch: DispatchFunction) {
+fun updateCyclistLocation(cyclistId: String?, newLocation: UserLocation, dispatch: DispatchFunction) {
     saveLocationDisposable = CycleRadarApp.repository
         ?.updateCyclist(cyclistId = cyclistId, location = newLocation)
         ?.subscribe { cyclist ->
@@ -52,12 +55,22 @@ fun saveUserLocation(cyclistId: String?, newLocation: UserLocation, dispatch: Di
         }
 }
 
-fun updateCyclists(dispatch: DispatchFunction) {
+fun getAllCyclists(dispatch: DispatchFunction) {
     val repository = CycleRadarApp.repository ?: return
 
     getCyclistListDisposable = Observable.interval(updatePeriod, TimeUnit.SECONDS)
         .flatMap { repository.getAllCyclists() }
         .subscribe { result ->
             dispatch(UpdateCyclists(allCyclists = result))
+        }
+}
+
+fun deleteCyclist(cyclistId: String, dispatch: DispatchFunction) {
+    val repository = CycleRadarApp.repository ?: return
+
+    deleteDispoable = repository
+        .deleteCyclist(cyclistId = cyclistId)
+        .subscribe { cyclistId ->
+            dispatch(DeleteMe(cyclistId = cyclistId))
         }
 }
