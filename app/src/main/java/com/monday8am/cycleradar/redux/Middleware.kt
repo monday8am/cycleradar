@@ -3,8 +3,8 @@ package com.monday8am.cycleradar.redux
 import android.util.Log
 import com.monday8am.cycleradar.CycleRadarApp
 import com.monday8am.cycleradar.data.UserLocation
-import io.reactivex.disposables.Disposable
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import org.rekotlin.DispatchFunction
 import org.rekotlin.Middleware
 import org.rekotlin.ReKotlinInit
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 private var saveLocationDisposable: Disposable? = null
 private var getCyclistListDisposable: Disposable? = null
-private var deleteDispoable: Disposable? = null
+private var deleteDisposable: Disposable? = null
 private var updatePeriod: Long = 10
 
 internal val loggingMiddleware: Middleware<AppState> = { _, _ ->
@@ -39,6 +39,10 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, getState ->
                     }
                 }
                 is StartStopUpdating -> {
+                    val myId = getState()?.meCycling?.id
+                    if (!action.isUpdating && myId != null) {
+                        deleteCyclist(myId, dispatch)
+                    }
                     CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
                 }
             }
@@ -59,6 +63,8 @@ fun getAllCyclists(dispatch: DispatchFunction) {
     val repository = CycleRadarApp.repository ?: return
 
     getCyclistListDisposable = Observable.interval(updatePeriod, TimeUnit.SECONDS)
+        .mergeWith(Observable.just(Long.MIN_VALUE))
+        .doOnNext { Log.d("MERGER", "$it") }
         .flatMap { repository.getAllCyclists() }
         .subscribe { result ->
             dispatch(UpdateCyclists(allCyclists = result))
@@ -68,9 +74,9 @@ fun getAllCyclists(dispatch: DispatchFunction) {
 fun deleteCyclist(cyclistId: String, dispatch: DispatchFunction) {
     val repository = CycleRadarApp.repository ?: return
 
-    deleteDispoable = repository
+    deleteDisposable = repository
         .deleteCyclist(cyclistId = cyclistId)
-        .subscribe { cyclistId ->
-            dispatch(DeleteMe(cyclistId = cyclistId))
+        .subscribe { deletedId ->
+            dispatch(DeleteMe(cyclistId = deletedId))
         }
 }

@@ -18,10 +18,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
-import com.monday8am.cycleradar.data.UserLocation
+import com.monday8am.cycleradar.data.Cyclist
 import com.monday8am.cycleradar.location.LocationUpdatesService
 import com.monday8am.cycleradar.redux.AppState
 import com.monday8am.cycleradar.redux.SetInitialContent
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     private var mBound = false
     private var mMap: GoogleMap? = null
 
+    private var myMarker: Marker? = null
     private var startMenuItem: MenuItem? = null
     private var stopMenuItem: MenuItem? = null
 
@@ -93,7 +96,8 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         runOnUiThread {
             startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
-            updateMapCenter(store.state.meCycling?.location)
+            updateMe(state.meCycling)
+            updateWorld(state.cyclists)
         }
     }
 
@@ -149,7 +153,7 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         // Add a marker in Sydney and move the camera
-        updateMapCenter(store.state.meCycling?.location)
+        updateMe(store.state.meCycling)
         val madridLocation = LatLng(40.416775, -3.703790)
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(madridLocation, 10.0f))
     }
@@ -162,10 +166,22 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         mService?.removeLocationUpdates()
     }
 
-    private fun updateMapCenter(lastLocation: UserLocation?) {
-        if (lastLocation != null) {
-            val myLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
-            mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
+    private fun updateMe(cyclist: Cyclist?) {
+        if (cyclist != null) {
+            val myLocation = LatLng(cyclist.latitude, cyclist.longitude)
+            myMarker = mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
+        } else {
+            Log.d("Marker", "myMarker: ${myMarker}")
+            myMarker?.remove()
+        }
+    }
+
+    private fun updateWorld(cyclists: List<Cyclist>) {
+        cyclists.forEach { cyclist ->
+            val location = LatLng(cyclist.latitude, cyclist.longitude)
+            mMap?.addMarker(MarkerOptions().position(location)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                .title(cyclist.id))
         }
     }
 

@@ -17,7 +17,12 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
             newState = newState.copy(meCycling = action.cyclist)
         }
         is UpdateCyclists -> {
-            newState = newState.copy(cyclists = action.allCyclists)
+            val mutableList = action.allCyclists.toMutableList()
+            mutableList.removeAll { it.id == newState.meCycling?.id }
+            newState = newState.copy(cyclists = mutableList)
+        }
+        is DeleteMe -> {
+            newState = newState.copy(meCycling = null)
         }
     }
 
