@@ -31,7 +31,7 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
 
 private fun getInitialState(): AppState {
     return AppState(
-        isGettingLocation = false,
+        isGettingLocation = LocationState.Stopped,
         meCycling = null,
         cyclists = listOf()
     )

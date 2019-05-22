@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.monday8am.cycleradar.data.UserLocation
+import com.monday8am.cycleradar.redux.LocationState
 
 class PreferencesHelper constructor(context: Context) {
 
@@ -15,7 +16,7 @@ class PreferencesHelper constructor(context: Context) {
     private val keyLastLongitude = "key_longitude"
     private val keyLastLatitude = "key_latitude"
 
-    fun requestingLocationUpdates(): Boolean {
+    fun requestingLocationUpdates(): LocationState {
         return pref.getBoolean(keyRequestingLocationUpdates, false)
     }
 

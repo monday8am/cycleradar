@@ -4,7 +4,7 @@ import com.monday8am.cycleradar.data.Cyclist
 import com.monday8am.cycleradar.data.UserLocation
 import org.rekotlin.Action
 
-data class SetInitialContent(val isUpdating: Boolean,
+data class SetInitialContent(val isUpdating: LocationState,
                              val lastLocation: UserLocation?) : Action
 
 data class UpdateMeAsCyclist(val cyclist: Cyclist) : Action

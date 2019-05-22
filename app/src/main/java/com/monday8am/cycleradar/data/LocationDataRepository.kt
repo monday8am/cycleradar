@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.monday8am.cycleradar.SchedulerProvider
 import com.monday8am.cycleradar.data.local.PreferencesHelper
+import com.monday8am.cycleradar.redux.LocationState
 import io.reactivex.Observable
 import java.util.*
 
@@ -16,7 +17,7 @@ class LocationDataRepository(private val preferences: PreferencesHelper,
     private val mFirestore = FirebaseFirestore.getInstance()
     private val tag = "LocationDataRepository"
 
-    fun isRequestingLocation(): Boolean {
+    fun isRequestingLocation(): LocationState {
         return preferences.requestingLocationUpdates()
     }
 

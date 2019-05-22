@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -26,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.monday8am.cycleradar.data.Cyclist
 import com.monday8am.cycleradar.location.LocationUpdatesService
 import com.monday8am.cycleradar.redux.AppState
+import com.monday8am.cycleradar.redux.LocationState
 import com.monday8am.cycleradar.redux.SetInitialContent
 import kotlinx.android.synthetic.main.activity_main.*
 import org.rekotlin.StoreSubscriber
@@ -94,6 +96,12 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
 
     override fun newState(state: AppState) {
         runOnUiThread {
+            when (state.isGettingLocation) {
+                LocationState.Stopped -> {
+                    startMenuItem?.isVisible = true
+                    stopMenuItem?.isVisible = false
+                }
+            }
             startMenuItem?.isVisible = !state.isGettingLocation
             stopMenuItem?.isVisible = state.isGettingLocation
             updateMe(state.meCycling)
@@ -169,10 +177,16 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
     private fun updateMe(cyclist: Cyclist?) {
         if (cyclist != null) {
             val myLocation = LatLng(cyclist.latitude, cyclist.longitude)
-            myMarker = mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
+            if (myMarker != null) {
+                myMarker?.position = myLocation
+                myMarker?.isVisible = true
+            } else {
+                myMarker = mMap?.addMarker(MarkerOptions().position(myLocation).title("Anton cycling"))
+            }
+
         } else {
-            Log.d("Marker", "myMarker: ${myMarker}")
-            myMarker?.remove()
+            Log.d("Marker", "myMarker: $myMarker")
+            myMarker?.isVisible = false
         }
     }
 

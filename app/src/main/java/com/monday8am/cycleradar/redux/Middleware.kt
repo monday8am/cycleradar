@@ -64,7 +64,6 @@ fun getAllCyclists(dispatch: DispatchFunction) {
 
     getCyclistListDisposable = Observable.interval(updatePeriod, TimeUnit.SECONDS)
         .mergeWith(Observable.just(Long.MIN_VALUE))
-        .doOnNext { Log.d("MERGER", "$it") }
         .flatMap { repository.getAllCyclists() }
         .subscribe { result ->
             dispatch(UpdateCyclists(allCyclists = result))
