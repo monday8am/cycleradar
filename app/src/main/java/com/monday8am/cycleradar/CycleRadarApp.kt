@@ -7,6 +7,7 @@ import com.monday8am.cycleradar.data.local.PreferencesHelper
 import com.monday8am.cycleradar.redux.appStateReducer
 import com.monday8am.cycleradar.redux.loggingMiddleware
 import com.monday8am.cycleradar.redux.networkMiddleware
+import io.paperdb.Paper
 import org.rekotlin.Store
 
 val store = Store(
@@ -22,6 +23,7 @@ class CycleRadarApp: Application() {
         instance = this
         repository = LocationDataRepository(preferences = providePreferences(applicationContext),
                                             scheduleProvider = AppSchedulerProvider())
+        Paper.init(applicationContext)
     }
 
     companion object {

@@ -10,11 +10,15 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
         is SetInitialContent -> {
             newState = newState.copy(isGettingLocation = action.isUpdating)
         }
-        is StartStopUpdating -> newState = newState.copy(isGettingLocation = action.isUpdating)
+        is StartStopUpdating -> {
+            newState = if (action.isUpdating) {
+                newState.copy(isGettingLocation = LocationState.Getting)
+            } else {
+                newState.copy(isGettingLocation = LocationState.Stopped)
+            }
+        }
         is UpdateMeAsCyclist -> {
-            val mutablePhotos = newState.cyclists.toMutableList()
-            mutablePhotos.add(action.cyclist)
-            newState = newState.copy(meCycling = action.cyclist)
+            newState = newState.copy(meCycling = action.cyclist, isGettingLocation = LocationState.Started)
         }
         is UpdateCyclists -> {
             val mutableList = action.allCyclists.toMutableList()
@@ -31,6 +35,7 @@ fun appStateReducer(action: Action, state: AppState?): AppState {
 
 private fun getInitialState(): AppState {
     return AppState(
+        isAppActive = true,
         isGettingLocation = LocationState.Stopped,
         meCycling = null,
         cyclists = listOf()

@@ -1,11 +1,13 @@
 package com.monday8am.cycleradar.data
 
 
+import android.os.AsyncTask
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.monday8am.cycleradar.SchedulerProvider
 import com.monday8am.cycleradar.data.local.PreferencesHelper
-import com.monday8am.cycleradar.redux.LocationState
+import com.monday8am.cycleradar.redux.AppState
+import io.paperdb.Paper
 import io.reactivex.Observable
 import java.util.*
 
@@ -15,19 +17,8 @@ class LocationDataRepository(private val preferences: PreferencesHelper,
 
     private val collectionPath = "cyclists"
     private val mFirestore = FirebaseFirestore.getInstance()
+    private val paperStateKey = "book.app.state"
     private val tag = "LocationDataRepository"
-
-    fun isRequestingLocation(): LocationState {
-        return preferences.requestingLocationUpdates()
-    }
-
-    fun getLastLocationSaved(): UserLocation? {
-        return preferences.getLastLocation()
-    }
-
-    fun setRequestingLocation(value: Boolean) {
-        preferences.setRequestingLocationUpdates(value)
-    }
 
     fun updateCyclist(cyclistId: String?, location: UserLocation): Observable<Cyclist> {
         preferences.addLastLocation(location)
@@ -82,5 +73,24 @@ class LocationDataRepository(private val preferences: PreferencesHelper,
                     it.onError(e)
                 }
         }
+    }
+
+    fun saveState(state: AppState) {
+        AsyncTask.execute {
+            Paper.book().write(paperStateKey, state)
+        }
+    }
+
+    fun getSavedState(): AppState? {
+        var emptyState: AppState? = null
+
+        try {
+            emptyState = Paper.book().read<AppState>(paperStateKey)
+        } catch (ex: Exception) {
+            Log.d("StateStorageManager", ex.localizedMessage)
+            Log.d("StateStorageManager", "Error getting the initial state")
+        }
+
+        return emptyState
     }
 }

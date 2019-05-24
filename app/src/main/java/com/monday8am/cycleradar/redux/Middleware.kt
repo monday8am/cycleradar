@@ -30,20 +30,28 @@ internal val networkMiddleware: Middleware<AppState> = { dispatch, getState ->
         { action ->
             when (action) {
                 is ReKotlinInit -> {
-                    getAllCyclists(dispatch)
+                    getRemoteListStream(dispatch)
                 }
                 is NewLocationDetected -> {
                     val meAsCyclist = getState()?.meCycling
                     if (action.location.isUseful(lastLocation = meAsCyclist?.location)) {
                         updateCyclistLocation(meAsCyclist?.id, action.location, dispatch)
                     }
+
+                    if (getState()?.isAppActive == true) {
+
+                    }
                 }
                 is StartStopUpdating -> {
                     val myId = getState()?.meCycling?.id
+
                     if (!action.isUpdating && myId != null) {
                         deleteCyclist(myId, dispatch)
                     }
-                    CycleRadarApp.repository?.setRequestingLocation(action.isUpdating)
+
+                    if (getState()?.isAppActive == true) {
+                        getRemoteListStream(dispatch)
+                    }
                 }
             }
             next(action)
@@ -62,6 +70,17 @@ fun updateCyclistLocation(cyclistId: String?, newLocation: UserLocation, dispatc
 fun getAllCyclists(dispatch: DispatchFunction) {
     val repository = CycleRadarApp.repository ?: return
 
+    getCyclistListDisposable?.dispose()
+    getCyclistListDisposable = repository.getAllCyclists()
+        .subscribe { result ->
+            dispatch(UpdateCyclists(allCyclists = result))
+        }
+}
+
+fun getRemoteListStream(dispatch: DispatchFunction) {
+    val repository = CycleRadarApp.repository ?: return
+
+    getCyclistListDisposable?.dispose()
     getCyclistListDisposable = Observable.interval(updatePeriod, TimeUnit.SECONDS)
         .mergeWith(Observable.just(Long.MIN_VALUE))
         .flatMap { repository.getAllCyclists() }
@@ -69,6 +88,7 @@ fun getAllCyclists(dispatch: DispatchFunction) {
             dispatch(UpdateCyclists(allCyclists = result))
         }
 }
+
 
 fun deleteCyclist(cyclistId: String, dispatch: DispatchFunction) {
     val repository = CycleRadarApp.repository ?: return

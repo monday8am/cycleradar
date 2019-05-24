@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Location Stream Example</string>
+    <string name="app_name">Cycle Radar</string>
     <string name="action_start">Start</string>
     <string name="action_stop">Stop</string>
     <string name="launch_activity">Launch Location Stream example</string>

@@ -17,11 +17,12 @@ class PreferencesHelper constructor(context: Context) {
     private val keyLastLatitude = "key_latitude"
 
     fun requestingLocationUpdates(): LocationState {
-        return pref.getBoolean(keyRequestingLocationUpdates, false)
+        val saved = pref.getInt(keyRequestingLocationUpdates, LocationState.Stopped.value)
+        return LocationState.fromInt(saved)
     }
 
-    fun setRequestingLocationUpdates(requestingLocationUpdates: Boolean) {
-        pref.edit().putBoolean(keyRequestingLocationUpdates, requestingLocationUpdates).apply()
+    fun setRequestingLocationUpdates(requestingLocationUpdates: LocationState) {
+        pref.edit().putInt(keyRequestingLocationUpdates, requestingLocationUpdates.value).apply()
     }
 
     fun addLastLocation(userLocation: UserLocation) {

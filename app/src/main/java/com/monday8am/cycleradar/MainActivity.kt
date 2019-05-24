@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -28,7 +27,6 @@ import com.monday8am.cycleradar.data.Cyclist
 import com.monday8am.cycleradar.location.LocationUpdatesService
 import com.monday8am.cycleradar.redux.AppState
 import com.monday8am.cycleradar.redux.LocationState
-import com.monday8am.cycleradar.redux.SetInitialContent
 import kotlinx.android.synthetic.main.activity_main.*
 import org.rekotlin.StoreSubscriber
 
@@ -66,9 +64,8 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         setSupportActionBar(toolbar)
 
         // Set saved content!
-        val isUpdatingLocation = CycleRadarApp.repository?.isRequestingLocation() ?: false
-        val lastLocation = CycleRadarApp.repository?.getLastLocationSaved()
-        store.dispatch(SetInitialContent(isUpdating = isUpdatingLocation, lastLocation = lastLocation))
+        //store.dispatch(SetInitialContent(isUpdating = isUpdatingLocation, lastLocation = lastLocation))
+        Log.d("TAG", "Set saved state!!")
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -77,6 +74,7 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
 
     override fun onStart() {
         super.onStart()
+
         // Bind to the service. If the service is in foreground mode, this signals to the service
         // that since this activity is in the foreground, the service can exit foreground mode.
         bindService(Intent(this, LocationUpdatesService::class.java),
@@ -101,9 +99,15 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
                     startMenuItem?.isVisible = true
                     stopMenuItem?.isVisible = false
                 }
+                LocationState.Getting -> {
+                    startMenuItem?.isVisible = false
+                    stopMenuItem?.isVisible = false
+                }
+                LocationState.Started -> {
+                    startMenuItem?.isVisible = false
+                    stopMenuItem?.isVisible = true
+                }
             }
-            startMenuItem?.isVisible = !state.isGettingLocation
-            stopMenuItem?.isVisible = state.isGettingLocation
             updateMe(state.meCycling)
             updateWorld(state.cyclists)
         }
@@ -125,8 +129,8 @@ class MainActivity : AppCompatActivity(), StoreSubscriber<AppState>, OnMapReadyC
         startMenuItem = menu.findItem(R.id.action_start)
         stopMenuItem = menu.findItem(R.id.action_stop)
 
-        startMenuItem?.isVisible = !store.state.isGettingLocation
-        stopMenuItem?.isVisible = store.state.isGettingLocation
+        startMenuItem?.isVisible = true
+        stopMenuItem?.isVisible = false
 
         return true
     }

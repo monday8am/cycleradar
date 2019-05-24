@@ -12,6 +12,7 @@ import com.google.android.gms.location.*
 import com.monday8am.cycleradar.MainActivity
 import com.monday8am.cycleradar.R
 import com.monday8am.cycleradar.data.UserLocation
+import com.monday8am.cycleradar.redux.LocationState
 import com.monday8am.cycleradar.redux.NewLocationDetected
 import com.monday8am.cycleradar.redux.StartStopUpdating
 import com.monday8am.cycleradar.store
@@ -93,7 +94,7 @@ class LocationUpdatesService : Service() {
         // Called when the last client (MainActivity in case of this sample) unbinds from this
         // service. If this method is called due to a configuration change in MainActivity, we
         // do nothing. Otherwise, we make this service a foreground service.
-        if (!mChangingConfiguration && store.state.isGettingLocation) {
+        if (!mChangingConfiguration && store.state.isGettingLocation == LocationState.Started) {
             Log.i(tag, "Starting foreground service")
             startForeground(notificationId, getNotification())
         }
